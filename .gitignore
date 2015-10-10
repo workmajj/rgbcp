@@ -1,0 +1,4 @@
+*.dSYM/
+.DS_Store
+wink-rx
+wink-tx
