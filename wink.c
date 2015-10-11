@@ -16,6 +16,10 @@ ffmpeg \
 #define VID_PX_W 320
 #define VID_PX_H 240
 
+#define FRAME_PX VID_PX_W * VID_PX_H
+#define FRAME_BYTES_TOT FRAME_PX * 4
+#define FRAME_BYTES_RGB FRAME_PX * 3
+
 enum {X, R, G, B}; // 0rgb format
 
 int main(int argc, char *argv[])
@@ -34,8 +38,8 @@ int main(int argc, char *argv[])
         case X:
             assert(curr == 255); // sync
             break;
-        case R:
-        case G:
+        case R: // fall through
+        case G: // fall through
         case B:
             byte_sum += curr;
             break;
@@ -45,9 +49,9 @@ int main(int argc, char *argv[])
 
         byte_count++;
 
-        if (byte_count == VID_PX_W * VID_PX_H * 4) {
-            printf("frame: %d\tbyte_count: %d\tbyte_sum: %d\n",
-                frame + 1, byte_count, byte_sum);
+        if (byte_count == FRAME_BYTES_TOT) {
+            printf("frame: %d\tbrightness: %.2f%%\n",
+                frame + 1, ((float)byte_sum / (FRAME_BYTES_RGB * 255)) * 100);
 
             frame++;
 
