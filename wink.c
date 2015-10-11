@@ -16,7 +16,7 @@ ffmpeg \
 #define VID_PX_W 320
 #define VID_PX_H 240
 
-enum {X, R, G, B}; // 0rgb
+enum {X, R, G, B}; // 0rgb format
 
 int main(int argc, char *argv[])
 {
@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 
         switch (bytes % 4) {
         case X:
-            break; // nop
+            assert(curr == 255); // sync
+            break;
         case R:
             r = curr;
             break;
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
 
         bytes++;
 
-        if (bytes == VID_PX_W * VID_PX_H * 4) { // bytes per pixel
+        if (bytes == VID_PX_W * VID_PX_H * 4) {
             frame++;
             bytes = 0;
         }
