@@ -1,5 +1,6 @@
 /*
 ffmpeg \
+    -loglevel panic \
     -f avfoundation \
     -pixel_format 0rgb \
     -framerate 30 \
