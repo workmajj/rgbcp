@@ -1,57 +1,60 @@
+/*
+ffmpeg \
+    -f avfoundation \
+    -pixel_format 0rgb \
+    -framerate 30 \
+    -video_size 320x240 \
+    -i "default:none" \
+    -f rawvideo - | ./wink
+*/
+
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#define VID_PX_W 320
+#define VID_PX_H 240
+
+enum {X, R, G, B}; // 0rgb
+
 int main(int argc, char *argv[])
 {
+    uint32_t frame = 0;
+    uint32_t bytes = 0; // per frame
+
+    uint8_t curr;
     uint8_t r, g, b;
 
-    char curr;
-    uint8_t step = 0;
-
-    unsigned int count = 0;
-    unsigned int frame = 1;
-
     while (1) {
-        if (count == 0) {
-            printf("FRAME\t%d\n", frame);
+        if (bytes == 0) {
+            printf("frame: %d\n", frame + 1);
         }
 
         curr = fgetc(stdin);
 
-        switch (step) { // TODO: enum
-        case 0:
-            // throwaway x for 0rgb format
-            step++;
-            break;
-        case 1:
+        switch (bytes % 4) {
+        case X:
+            break; // nop
+        case R:
             r = curr;
-            step++;
             break;
-        case 2:
+        case G:
             g = curr;
-            step++;
             break;
-        case 3:
+        case B:
             b = curr;
-            step = 0;
             break;
         default:
-            // not reached
-            break;
+            assert(0 && "not reached");
         }
 
-        // printf("%u %u %u ", r, g, b);
+        bytes++;
 
-        count++;
-        if (count == 320 * 240 * 4) {
-            // printf("----------------------------------------\n\n\n\n\n\n");
-
-            count = 0;
+        if (bytes == VID_PX_W * VID_PX_H * 4) { // bytes per pixel
             frame++;
+            bytes = 0;
         }
     }
-
-    // fclose(fin);
 
     return 0;
 }
