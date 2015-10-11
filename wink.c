@@ -24,13 +24,10 @@ int main(int argc, char *argv[])
     uint32_t bytes = 0; // per frame
 
     uint8_t curr;
-    uint8_t r, g, b;
+
+    uint32_t sum = 0;
 
     while (1) {
-        if (bytes == 0) {
-            printf("frame: %d\n", frame + 1);
-        }
-
         curr = fgetc(stdin);
 
         switch (bytes % 4) {
@@ -38,13 +35,9 @@ int main(int argc, char *argv[])
             assert(curr == 255); // sync
             break;
         case R:
-            r = curr;
-            break;
         case G:
-            g = curr;
-            break;
         case B:
-            b = curr;
+            sum += curr;
             break;
         default:
             assert(0 && "not reached");
@@ -53,8 +46,12 @@ int main(int argc, char *argv[])
         bytes++;
 
         if (bytes == VID_PX_W * VID_PX_H * 4) {
+            printf("frame: %d, bytes: %d, sum: %d\n", frame + 1, bytes, sum);
+
             frame++;
+
             bytes = 0;
+            sum = 0;
         }
     }
 
