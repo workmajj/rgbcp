@@ -29,7 +29,7 @@ int main()
     int num = 0;
 
     while (1) {
-        attrset(COLOR_PAIR((num % 8) + 1));
+        attrset(COLOR_PAIR(num + 1));
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {

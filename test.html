@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <script>
+        var toggle = false;
+        setInterval(function() {
+            document.getElementsByTagName('body')[0]
+                .style.backgroundColor = (toggle ? 'black' : 'white');
+            toggle = !toggle;
+        }, 1000/10);
+        </script>
+    </head>
+    <body>
+        <p>10 fps</p>
+    </body>
+</html>
