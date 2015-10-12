@@ -2,8 +2,6 @@
 
 #include "curses.h"
 
-#include "wink.h" // FRAMES_PER_BIT
-
 int main()
 {
     initscr();

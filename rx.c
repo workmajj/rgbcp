@@ -10,36 +10,18 @@ ffmpeg \
 */
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "wink.h" // FRAMES_PER_BIT
 
 #define VID_PX_W 320
 #define VID_PX_H 240
 
 enum {X, R, G, B}; // 0rgb format
 
-void draw(unsigned long *buf, const unsigned long frame)
-{
-    unsigned long sum = 0;
-
-    for (int i = 0; i < FRAMES_PER_BIT; i++) {
-        sum += buf[i];
-    }
-
-    float bright = (sum / (float)FRAMES_PER_BIT) /
-        (VID_PX_W * VID_PX_H * 3 * 255);
-
-    printf("bit frame: %lu\tbrightness: %.2f%%\n",
-        frame / FRAMES_PER_BIT, bright * 100);
-}
-
 int main(int argc, char *argv[])
 {
-    unsigned long buf[FRAMES_PER_BIT] = {0};
+    unsigned long sum = 0;
 
     unsigned long vid_bytes = 0;
     unsigned long vid_frame = 0;
@@ -56,7 +38,7 @@ int main(int argc, char *argv[])
         case R: // fallthru
         case G: // fallthru
         case B:
-            buf[vid_frame % FRAMES_PER_BIT] += c;
+            sum += c;
             break;
         default:
             assert(0 && "not reached");
@@ -71,10 +53,10 @@ int main(int argc, char *argv[])
             vid_frame++;
             assert(vid_frame > 0 && "overflow");
 
-            if (vid_frame % FRAMES_PER_BIT == 0) {
-                draw(buf, vid_frame);
-                memset(buf, 0, sizeof(buf));
-            }
+            printf("frame: %lu\tbrightness: %.2f%%\n", vid_frame,
+                ((float)sum / (VID_PX_W * VID_PX_H * 3 * 255)) * 100);
+
+            sum = 0;
         }
     }
 
