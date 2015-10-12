@@ -1,15 +1,36 @@
 <html>
-    <head>
-        <script>
-        var toggle = false;
-        setInterval(function() {
-            document.getElementsByTagName('body')[0]
-                .style.backgroundColor = (toggle ? 'black' : 'white');
-            toggle = !toggle;
-        }, 1000/10);
-        </script>
-    </head>
     <body>
-        <p>10 fps</p>
+        <select>
+            <option value="0" selected>&ndash;</option>
+            <option value="1">1 fps</option>
+            <option value="5">5 fps</option>
+            <option value="10">10 fps</option>
+            <option value="15">15 fps</option>
+            <option value="20">20 fps</option>
+            <option value="30">30 fps</option>
+        </select>
     </body>
+    <script>
+        var body = document.getElementsByTagName('body')[0];
+        var select = document.getElementsByTagName('select')[0];
+
+        var id, toggle;
+
+        select.addEventListener('change', function() {
+            var fps = parseInt(select.value, 10);
+
+            clearInterval(id);
+            toggle = false;
+
+            if (fps === 0) {
+                body.style.backgroundColor = 'white';
+            }
+            else {
+                id = setInterval(function() {
+                    body.style.backgroundColor = (toggle ? 'white' : 'black');
+                    toggle = !toggle;
+                }, Math.round(1000 / fps));
+            }
+        });
+    </script>
 </html>
