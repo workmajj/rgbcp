@@ -6,9 +6,9 @@ all: clean wink
 wink: rx tx
 
 rx:
-	$(CC) -o rx rx.c
+	$(CC) -o rx src/rx.c
 tx:
-	$(CC) -o tx -lncurses tx.c
+	$(CC) -o tx -lncurses src/tx.c
 
 .PHONY: clean
 clean:
