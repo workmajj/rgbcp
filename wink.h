@@ -1,0 +1,1 @@
+#define FRAMES_PER_BIT 15
