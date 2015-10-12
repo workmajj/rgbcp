@@ -8,7 +8,7 @@ wink: rx tx
 rx:
 	$(CC) -o rx rx.c
 tx:
-	$(CC) -o tx tx.c
+	$(CC) -o tx -lncurses tx.c
 
 .PHONY: clean
 clean:
