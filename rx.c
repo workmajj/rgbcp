@@ -15,10 +15,10 @@ ffmpeg \
 #include <stdlib.h>
 #include <string.h>
 
+#include "wink.h" // FRAMES_PER_BIT
+
 #define VID_PX_W 320
 #define VID_PX_H 240
-
-#define FRAMES_PER_BIT 15
 
 enum {X, R, G, B}; // 0rgb format
 
