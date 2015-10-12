@@ -1,14 +1,12 @@
-NAME = wink
-
 CC = clang
 CFLAGS = -Wall -g
 
-all: clean wink
+all: clean rx
 
-wink:
-	$(CC) -o $(NAME) $(NAME).c
+rx:
+	$(CC) -o rx rx.c
 
 .PHONY: clean
 clean:
-	rm -f $(NAME)
-	rm -rf $(NAME).dSYM
+	rm -f rx
+	rm -rf rx.dSYM

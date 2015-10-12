@@ -6,7 +6,7 @@ ffmpeg \
     -framerate 30 \
     -video_size 320x240 \
     -i "default:none" \
-    -f rawvideo - | ./wink
+    -f rawvideo - | ./rx
 */
 
 #include <assert.h>
