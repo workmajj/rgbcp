@@ -10,54 +10,76 @@ ffmpeg \
 */
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define VID_PX_W 320
-#define VID_PX_H 240
+#define FRAME_PX_W 320
+#define FRAME_PX_H 240
 
-enum {X, R, G, B}; // 0rgb format
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} Pixel;
 
-int main(int argc, char *argv[])
+Pixel frame_get_avg()
 {
-    unsigned long sum = 0;
+    Pixel avg;
 
-    unsigned long vid_bytes = 0;
-    unsigned long vid_frame = 0;
+    unsigned long sum_r = 0;
+    unsigned long sum_g = 0;
+    unsigned long sum_b = 0;
 
+    unsigned long bytes = 0;
     unsigned char c;
 
-    while (1) {
+    while (bytes < FRAME_PX_W * FRAME_PX_H * 4) {
         c = fgetc(stdin);
 
-        switch (vid_bytes % 4) {
-        case X:
-            assert(c == 255 && "not synced");
+        switch (bytes % 4) { // 0rgb format
+        case 0:
+            assert(c == 255 && "video bytes misordered");
             break;
-        case R: // fallthru
-        case G: // fallthru
-        case B:
-            sum += c;
+        case 1:
+            sum_r += c;
+            break;
+        case 2:
+            sum_g += c;
+            break;
+        case 3:
+            sum_b += c;
             break;
         default:
             assert(0 && "not reached");
         }
 
-        vid_bytes++;
-        assert(vid_bytes > 0 && "overflow");
+        bytes++;
+        assert(bytes > 0 && "overflow");
+    }
 
-        if (vid_bytes == VID_PX_W * VID_PX_H * 4) {
-            vid_bytes = 0;
+    // FIXME: round instead of truncating
+    avg.r = sum_r / (FRAME_PX_W * FRAME_PX_H);
+    avg.g = sum_g / (FRAME_PX_W * FRAME_PX_H);
+    avg.b = sum_b / (FRAME_PX_W * FRAME_PX_H);
 
-            vid_frame++;
-            assert(vid_frame > 0 && "overflow");
+    return avg;
+}
 
-            printf("frame: %lu\tbrightness: %.2f%%\n", vid_frame,
-                ((float)sum / (VID_PX_W * VID_PX_H * 3 * 255)) * 100);
+int main()
+{
+    unsigned long frame = 0;
 
-            sum = 0;
-        }
+    Pixel avg;
+
+    while (1) {
+        avg = frame_get_avg();
+
+        printf("frame: %lu\tr: %d\tg: %d\tb: %d\n", frame + 1,
+            avg.r, avg.g, avg.b);
+
+        frame++;
+        assert(frame > 0 && "overflow");
     }
 
     return 0;
