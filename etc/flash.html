@@ -1,44 +1,24 @@
 <html>
-    <body style='background-color:rgb(255, 0, 0)'>
-        <!--
-        <select>
-            <option value="0" selected>&ndash;</option>
-            <option value="1">1 fps</option>
-            <option value="5">5 fps</option>
-            <option value="10">10 fps</option>
-            <option value="15">15 fps</option>
-            <option value="20">20 fps</option>
-            <option value="30">30 fps</option>
-        </select>
-        -->
-    </body>
+    <body><p>15 fps</p></body>
     <script>
         var body = document.getElementsByTagName('body')[0];
-        var select = document.getElementsByTagName('select')[0];
 
-        var step = [66, 66, 67]; // 15 fps
-        var idx = 0;
+        var rgb_idx = 0;
+        var rgb_step = [
+            'rgb(255, 0, 0)',
+            'rgb(0, 255, 0)',
+            'rgb(0, 0, 255)',
+            'rgb(0, 255, 0)'
+        ];
 
-        var id, toggle;
+        var ms_idx = 0;
+        var ms_step = [66, 66, 67]; // 15 fps
 
-        // select.addEventListener('change', function() {
-        //     var fps = parseInt(select.value, 10);
+        setInterval(function() {
+            body.style.backgroundColor = rgb_step[rgb_idx];
 
-            clearInterval(id);
-            toggle = false;
-
-            // if (fps === 0) {
-            //     body.style.backgroundColor = 'rgb(255, 0, 0)';
-            // }
-            // else {
-                id = setInterval(function() {
-                    body.style.backgroundColor =
-                        (toggle ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)');
-
-                    toggle = !toggle;
-                    idx = (idx === step.length - 1) ? 0 : idx + 1;
-                }, step[idx]);
-        //     }
-        // });
+            rgb_idx = (rgb_idx === rgb_step.length - 1) ? 0 : rgb_idx + 1;
+            ms_idx = (ms_idx === rgb_step.length - 1) ? 0 : ms_idx + 1;
+        }, ms_step[ms_idx]);
     </script>
 </html>
