@@ -34,12 +34,12 @@ Pixel frame_get_avg()
     unsigned long bytes = 0;
     unsigned char c;
 
-    while (bytes < FRAME_PX_W * FRAME_PX_H * 4) {
+    while (bytes < FRAME_PX_W * FRAME_PX_H * 4) { // 0rgb format
         c = fgetc(stdin);
 
-        switch (bytes % 4) { // 0rgb format
+        switch (bytes % 4) {
         case 0:
-            assert(c == 255 && "video bytes misordered");
+            assert(c == 255 && "bytes misordered");
             break;
         case 1:
             sum_r += c;
@@ -66,17 +66,147 @@ Pixel frame_get_avg()
     return avg;
 }
 
+typedef enum {X, R, G, B} FrameColor;
+
 int main()
 {
     unsigned long frame = 0;
 
+    /*
+    Pixel curr;
+    Pixel last;
+
+    while (1) {
+        curr = frame_get_avg();
+
+        printf("frame: %lu\tr: %d\tg: %d\tb: %d\n", frame + 1,
+            avg.r, avg.g, avg.b);
+
+        frame++;
+        assert(frame > 0 && "overflow");
+
+        last = curr;
+    }
+    */
+
     Pixel avg;
+
+    FrameColor curr;
+    FrameColor last[3];
+
+    /*
+    R R R => ?
+    B B B => ?
+
+    R R B => B <=
+    B B R => R <=
+
+    B R R => ?
+    R B B => ?
+
+    R B R => ?
+    B R B => ?
+    */
 
     while (1) {
         avg = frame_get_avg();
 
-        printf("frame: %lu\tr: %d\tg: %d\tb: %d\n", frame + 1,
+        printf("frame: %lu\tr: %d\tg: %d\tb: %d\t", frame + 1,
             avg.r, avg.g, avg.b);
+
+        /*
+        if (avg.r < 255 * 0.25 && avg.g < 255 * 0.25 && avg.b < 255 * 0.25) {
+            printf("\t--\t--\n");
+            curr = X;
+        }
+        else if (avg.r > 255 * 0.75 && avg.b < 255 * 0.25) {
+            curr = R;
+            printf("\tR\t1\n");
+        }
+        else if (avg.b > 255 * 0.75 && avg.r < 255 * 0.25) {
+            curr = B;
+            printf("\tB\t0\n");
+        }
+        else if (avg.r > avg.b) {
+            if (last[2] == R && last[1] == B && last[0] == B) {
+                curr = R;
+                printf("\tR\t1\n");
+            }
+            else {
+                curr = X;
+                printf("\tR?\t1?\n");
+            }
+        }
+        else if (avg.b > avg.r) {
+            if (last[2] == B && last[1] == R && last[0] == R) {
+                curr = B;
+                printf("\tB\t0\n");
+            }
+            else {
+                curr = X;
+                printf("\tB?\t0?\n");
+            }
+        }
+        else {
+            printf("\t??\t??\n");
+            curr = X;
+        }
+        */
+
+        if (avg.r < 255 * 0.25 && avg.g < 255 * 0.25 && avg.b < 255 * 0.25) {
+            printf("\t-\n");
+            curr = X;
+        }
+        else if (avg.r > 255 * 0.75 && avg.g < 255 * 0.25 && avg.b < 255 * 0.25) {
+            curr = R;
+            printf("\tR\t0\n");
+        }
+        else if (avg.r < 255 * 0.25 && avg.g > 255 * 0.75 && avg.b < 255 * 0.25) {
+            curr = R;
+            printf("\tG\n");
+        }
+        else if (avg.r < 255 * 0.25 && avg.g < 255 * 0.25 && avg.b > 255 * 0.75) {
+            curr = R;
+            printf("\tB\t1\n");
+        }
+        else if (avg.r > avg.b && avg.r > avg.g) {
+            if (last[2] == R && last[1] != R && last[0] != R) {
+                curr = R;
+                printf("\tR\t0\n");
+            }
+            else {
+                curr = X;
+                printf("\tR?\t0\n");
+            }
+        }
+        else if (avg.g > avg.r && avg.g > avg.b) {
+            if (last[2] == G && last[1] != G && last[0] != G) {
+                curr = G;
+                printf("\tG\n");
+            }
+            else {
+                curr = X;
+                printf("\tG?\n");
+            }
+        }
+        else if (avg.b > avg.r && avg.b > avg.g) {
+            if (last[2] == B && last[1] != B && last[0] != B) {
+                curr = B;
+                printf("\tB\t1\n");
+            }
+            else {
+                curr = X;
+                printf("\tB?\t1\n");
+            }
+        }
+        else {
+            printf("\t??\n");
+            curr = X;
+        }
+
+        last[0] = last[1];
+        last[1] = last[2];
+        last[2] = curr;
 
         frame++;
         assert(frame > 0 && "overflow");
