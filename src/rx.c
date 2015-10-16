@@ -16,6 +16,8 @@ ffmpeg \
 #define FRAME_W 320
 #define FRAME_H 240
 
+#define RGB_THRESH 64
+
 typedef struct {
     uint8_t r;
     uint8_t g;
@@ -67,90 +69,53 @@ FramePixel frame_get_avg()
     return avg;
 }
 
-FrameColor frame_get(FrameColor prev[])
+FrameColor frame_get_color()
 {
-    assert(prev != NULL);
-
-    FrameColor curr;
-    FrameColor note;
-
     FramePixel avg = frame_get_avg();
 
-    printf("\tr: %d\tg: %d\tb: %d", avg.r, avg.g, avg.b);
+    printf("r: %d\tg: %d\tb: %d\t", avg.r, avg.g, avg.b);
 
-    if (avg.r < 256 * 0.25 && avg.g < 256 * 0.25 && avg.b < 256 * 0.25) {
-        curr = X;
-        note = X;
+    if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
+        return X;
     }
     else if (avg.r > avg.b && avg.r > avg.g) {
-        if (prev[2] == R && prev[1] == G && prev[0] == G) {
-            curr = R;
-            note = R;
-        }
-        else {
-            curr = R;
-            note = X;
-        }
+        return R;
     }
     else if (avg.g > avg.r && avg.g > avg.b) {
-        if (prev[2] == G &&
-            (prev[1] == R || prev[1] == B) &&
-            (prev[0] == R || prev[0] == B)) {
-                curr = G;
-                note = G;
-        }
-        else {
-            curr = G;
-            note = X;
-        }
+        return G;
     }
     else if (avg.b > avg.r && avg.b > avg.g) {
-        if (prev[2] == B && prev[1] == G && prev[0] == G) {
-            curr = B;
-            note = B;
-        }
-        else {
-            curr = B;
-            note = X;
-        }
-    }
-    else {
-        curr = X;
-        note = X;
+        return B;
     }
 
-    prev[0] = prev[1];
-    prev[1] = prev[2];
-    prev[2] = note;
-
-    return curr;
+    return X;
 }
 
 int main()
 {
-    unsigned long frame = 0;
-
-    FrameColor prev[3];
+    unsigned long frame = 1;
 
     while (1) {
-        printf("frame: %lu", frame + 1);
+        printf("frame: %lu\t", frame);
 
-        switch (frame_get(prev)) {
+        switch (frame_get_color()) {
         case X:
-            printf("\t-\n");
+            printf("-");
             break;
         case R:
-            printf("\tR\t0\n");
+            printf("R\t0");
             break;
         case G:
-            printf("\tG\n");
+            printf("G");
             break;
         case B:
-            printf("\tB\t1\n");
+            printf("B\t1");
             break;
         default:
             assert(0 && "not reached");
         }
+
+        printf("\n");
 
         frame++;
         assert(frame > 0 && "overflow");
