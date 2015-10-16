@@ -73,7 +73,7 @@ FrameColor frame_get_color()
 {
     FramePixel avg = frame_get_avg();
 
-    printf("r: %d\tg: %d\tb: %d\t", avg.r, avg.g, avg.b);
+    // printf("r: %d\tg: %d\tb: %d\t", avg.r, avg.g, avg.b);
 
     if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
         return X;
@@ -93,29 +93,28 @@ FrameColor frame_get_color()
 
 int main()
 {
-    unsigned long frame = 1;
+    unsigned long frame = 0;
+
+    FrameColor curr = X;
+    FrameColor last = X;
+
+    setbuf(stdout, NULL);
 
     while (1) {
-        printf("frame: %lu\t", frame);
+        // printf("frame: %lu\t", frame);
 
-        switch (frame_get_color()) {
-        case X:
-            printf("-");
-            break;
-        case R:
-            printf("R\t0");
-            break;
-        case G:
-            printf("G");
-            break;
-        case B:
-            printf("B\t1");
-            break;
-        default:
-            assert(0 && "not reached");
+        curr = frame_get_color();
+
+        if (curr != last && curr == R) {
+            printf("0");
+        }
+        else if (curr != last && curr == B) {
+            printf("1");
         }
 
-        printf("\n");
+        // printf("\n");
+
+        last = curr;
 
         frame++;
         assert(frame > 0 && "overflow");
