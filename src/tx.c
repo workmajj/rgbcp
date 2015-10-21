@@ -2,7 +2,7 @@
 
 #include "curses.h"
 
-int main()
+int main(void)
 {
     initscr();
 

@@ -26,7 +26,7 @@ typedef struct {
 
 typedef enum {X, R, G, B} FrameColor;
 
-FramePixel frame_get_avg()
+FramePixel frame_get_avg(void)
 {
     FramePixel avg;
 
@@ -69,7 +69,7 @@ FramePixel frame_get_avg()
     return avg;
 }
 
-FrameColor frame_get_color()
+FrameColor frame_get_color(void)
 {
     FramePixel avg = frame_get_avg();
 
@@ -78,7 +78,8 @@ FrameColor frame_get_color()
     if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
         return X;
     }
-    else if (avg.r > avg.b && avg.r > avg.g) {
+
+    if (avg.r > avg.b && avg.r > avg.g) {
         return R;
     }
     else if (avg.g > avg.r && avg.g > avg.b) {
@@ -91,7 +92,7 @@ FrameColor frame_get_color()
     return X;
 }
 
-int main()
+int main(void)
 {
     unsigned long frame = 0;
 
