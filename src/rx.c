@@ -24,7 +24,7 @@ typedef struct {
     uint8_t b;
 } FramePixel;
 
-typedef enum {X, R, G, B} FrameColor;
+typedef enum {X, R, G, B} FrameColor; // FIXME: shared
 
 FramePixel frame_get_avg(void)
 {
@@ -35,10 +35,11 @@ FramePixel frame_get_avg(void)
     unsigned long sum_b = 0;
 
     unsigned long bytes = 0;
-    unsigned char c;
+
+    int c;
 
     while (bytes < FRAME_W * FRAME_H * 4) { // 0rgb format
-        c = fgetc(stdin);
+        c = getchar();
 
         switch (bytes % 4) {
         case 0:
