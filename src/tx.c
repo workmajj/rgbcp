@@ -3,7 +3,7 @@
 
 #include "curses.h"
 
-#define SYNC_MS 3000
+#define SYNC_MS 2000
 
 typedef unsigned int uint; // FIXME: shared
 
@@ -35,6 +35,7 @@ void color_show(const FrameColor c, const uint rows, const uint cols)
     refresh();
 }
 
+/*
 void color_cycle(const uint rows, const uint cols)
 {
     const size_t RGB_SIZE = 4;
@@ -54,6 +55,7 @@ void color_cycle(const uint rows, const uint cols)
         idx_ms = (idx_ms == MS_SIZE - 1) ? 0 : idx_ms + 1;
     }
 }
+*/
 
 int main(void)
 {
@@ -69,11 +71,33 @@ int main(void)
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_BLUE, COLOR_BLUE);
 
-    // initial sync signal
+    // start
     color_show(G, rows, cols);
     usleep(SYNC_MS * 1000);
 
-    color_cycle(rows, cols);
+    int c;
+
+    while ((c = getchar()) != EOF) {
+        for (uint i = 0; i < 8; i++) {
+            if (c & (1 << i)) {
+                color_show(B, rows, cols); // 1
+                usleep(66 * 1000);
+            }
+            else {
+                color_show(R, rows, cols); // 0
+                usleep(66 * 1000);
+            }
+
+            color_show(G, rows, cols);
+            usleep(66 * 1000);
+        }
+    }
+
+    // stop
+    color_show(G, rows, cols);
+    usleep(SYNC_MS * 1000);
+
+    // color_cycle(rows, cols);
 
     endwin(); // FIXME: clean up on SIGINT
 
