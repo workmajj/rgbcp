@@ -79,7 +79,7 @@ int main(void)
 
     while ((c = getchar()) != EOF) {
         for (uint i = 0; i < 8; i++) {
-            if (c & (1 << i)) {
+            if (c & (0b10000000 >> i)) {
                 color_show(B, rows, cols); // 1
                 usleep(66 * 1000);
             }
