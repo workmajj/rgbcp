@@ -3,6 +3,8 @@
 
 #include "curses.h"
 
+#define SYNC_MS 3000
+
 typedef unsigned int uint; // FIXME: shared
 
 typedef enum {X, R, G, B} FrameColor; // FIXME: shared
@@ -33,7 +35,7 @@ void color_show(const FrameColor c, const uint rows, const uint cols)
     refresh();
 }
 
-int main(void)
+void color_cycle(const uint rows, const uint cols)
 {
     const size_t RGB_SIZE = 4;
     const FrameColor RGB_STEP[] = {R, G, B, G};
@@ -41,6 +43,20 @@ int main(void)
     const size_t MS_SIZE = 3;
     const uint MS_STEP[] = {66, 66, 67}; // 15 fps
 
+    uint idx_rgb = 0;
+    uint idx_ms = 0;
+
+    while (1) {
+        color_show(RGB_STEP[idx_rgb], rows, cols);
+        usleep(MS_STEP[idx_ms] * 1000);
+
+        idx_rgb = (idx_rgb == RGB_SIZE - 1) ? 0 : idx_rgb + 1;
+        idx_ms = (idx_ms == MS_SIZE - 1) ? 0 : idx_ms + 1;
+    }
+}
+
+int main(void)
+{
     uint rows, cols;
 
     initscr();
@@ -53,16 +69,11 @@ int main(void)
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_BLUE, COLOR_BLUE);
 
-    uint idx_rgb = 0;
-    uint idx_ms = 0;
+    // initial sync signal
+    color_show(G, rows, cols);
+    usleep(SYNC_MS * 1000);
 
-    while (1) {
-        color_show(RGB_STEP[idx_rgb], rows, cols);
-        usleep(MS_STEP[idx_ms] * 1000);
-
-        idx_rgb = (idx_rgb == RGB_SIZE - 1) ? 0 : idx_rgb + 1;
-        idx_ms = (idx_ms == MS_SIZE - 1) ? 0 : idx_ms + 1;
-    }
+    color_cycle(rows, cols);
 
     endwin(); // FIXME: clean up on SIGINT
 
