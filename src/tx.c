@@ -3,27 +3,28 @@
 
 #include "curses.h"
 
-#define SYNC_MS 1000
+#define SYNC_DURATION 1000
+
+typedef unsigned int uint;
 
 typedef enum {X, R, G, B} FrameColor; // FIXME: shared
 
-unsigned int screen_rows;
-unsigned int screen_cols;
+uint term_rows, term_cols;
 
-unsigned int step_gen(void)
+uint frame_step(void)
 {
-    const size_t STEP_SIZE = 3;
-    const unsigned int STEP[] = {66, 66, 67}; // 15 fps
+    const size_t SIZE = 3;
+    const uint DURATION_MS[] = {66, 66, 67}; // 15 fps
 
-    static unsigned int idx = 0;
-    unsigned int r = idx;
+    static uint idx = 0;
+    uint r = idx;
 
-    idx = (idx == STEP_SIZE - 1) ? 0 : idx + 1;
+    idx = (idx == SIZE - 1) ? 0 : idx + 1;
 
-    return STEP[r];
+    return DURATION_MS[r];
 }
 
-void frame_show(const FrameColor c, const unsigned int sleep_ms)
+void frame_show(const FrameColor c, const uint duration_ms)
 {
     switch (c) {
     case R:
@@ -39,8 +40,8 @@ void frame_show(const FrameColor c, const unsigned int sleep_ms)
         assert(0 && "bad color");
     }
 
-    for (int i = 0; i < screen_rows; i++) {
-        for (int j = 0; j < screen_cols; j++) {
+    for (uint i = 0; i < term_rows; i++) {
+        for (uint j = 0; j < term_cols; j++) {
             move(i, j);
             printw(" ");
         }
@@ -48,41 +49,42 @@ void frame_show(const FrameColor c, const unsigned int sleep_ms)
 
     refresh();
 
-    usleep(sleep_ms * 1000); // millis to micros
+    usleep(duration_ms * 1000); // millis to micros
 }
 
 int main(void)
 {
     initscr();
-    getmaxyx(stdscr, screen_rows, screen_cols); // globals
 
-    // FIXME: has_colors()
+    // FIXME: check has_colors()
+
+    getmaxyx(stdscr, term_rows, term_cols);
 
     start_color();
     init_pair(1, COLOR_RED, COLOR_RED);
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_BLUE, COLOR_BLUE);
 
-    frame_show(G, SYNC_MS); // start
+    frame_show(G, SYNC_DURATION); // start
 
     int c;
 
     while ((c = getchar()) != EOF) {
-        for (int i = 0; i < 8; i++) {
+        for (uint i = 0; i < 8; i++) {
             if (c & (0b10000000 >> i)) {
-                frame_show(B, step_gen()); // 1
+                frame_show(B, frame_step()); // 1
             }
             else {
-                frame_show(R, step_gen()); // 0
+                frame_show(R, frame_step()); // 0
             }
 
-            frame_show(G, step_gen());
+            frame_show(G, frame_step());
         }
     }
 
-    frame_show(G, SYNC_MS); // stop
+    frame_show(G, SYNC_DURATION); // stop
 
-    endwin(); // FIXME: clean up on SIGINT
+    endwin();
 
     return 0;
 }
