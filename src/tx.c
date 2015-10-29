@@ -17,11 +17,11 @@ uint frame_step(void)
     const uint DURATION_MS[] = {66, 66, 67}; // 15 fps
 
     static uint idx = 0;
-    uint r = idx;
+    uint i = idx;
 
     idx = (idx == SIZE - 1) ? 0 : idx + 1;
 
-    return DURATION_MS[r];
+    return DURATION_MS[i];
 }
 
 void frame_show(const FrameColor c, const uint duration_ms)
@@ -49,7 +49,7 @@ void frame_show(const FrameColor c, const uint duration_ms)
 
     refresh();
 
-    usleep(duration_ms * 1000); // millis to micros
+    usleep(duration_ms * 1000); // to micros
 }
 
 int main(void)

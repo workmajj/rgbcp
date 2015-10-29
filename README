@@ -1,1 +1,1 @@
-wink (requires: ffmpeg, ncurses)
+rgbcp (deps: ffmpeg, ncurses)

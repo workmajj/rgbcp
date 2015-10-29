@@ -1,9 +1,9 @@
 CC = clang
 CFLAGS = -Wall -g
 
-all: clean wink
+all: clean rgbcp
 
-wink: rx tx
+rgbcp: rx tx
 
 rx:
 	$(CC) -o rx src/rx.c
