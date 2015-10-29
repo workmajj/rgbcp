@@ -18,6 +18,8 @@ ffmpeg \
 
 #define RGB_THRESH 64
 
+typedef unsigned long ulong;
+
 typedef struct {
     uint8_t r;
     uint8_t g;
@@ -30,11 +32,11 @@ FramePixel frame_get_avg(void)
 {
     FramePixel avg;
 
-    unsigned long sum_r = 0;
-    unsigned long sum_g = 0;
-    unsigned long sum_b = 0;
+    ulong sum_r = 0;
+    ulong sum_g = 0;
+    ulong sum_b = 0;
 
-    unsigned long bytes = 0;
+    ulong bytes = 0;
 
     int c;
 
@@ -95,7 +97,7 @@ FrameColor frame_get_color(void)
 
 int main(void)
 {
-    unsigned long frame = 0;
+    ulong frame = 0;
 
     FrameColor curr = X;
     FrameColor last = X;
