@@ -3,11 +3,9 @@
 
 #include "curses.h"
 
+#include "types.h"
+
 #define SYNC_DURATION 1000
-
-typedef unsigned int uint;
-
-typedef enum {X, R, G, B} FrameColor; // FIXME: shared
 
 uint term_rows, term_cols;
 
@@ -27,13 +25,13 @@ uint frame_step(void)
 void frame_show(const FrameColor c, const uint duration_ms)
 {
     switch (c) {
-    case R:
+    case FRAME_RED:
         attrset(COLOR_PAIR(1));
         break;
-    case G:
+    case FRAME_GREEN:
         attrset(COLOR_PAIR(2));
         break;
-    case B:
+    case FRAME_BLUE:
         attrset(COLOR_PAIR(3));
         break;
     default:
@@ -65,24 +63,24 @@ int main(void)
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_BLUE, COLOR_BLUE);
 
-    frame_show(G, SYNC_DURATION); // start
+    frame_show(FRAME_GREEN, SYNC_DURATION); // start
 
     int c;
 
     while ((c = getchar()) != EOF) {
         for (uint i = 0; i < 8; i++) {
             if (c & (0b10000000 >> i)) {
-                frame_show(B, frame_step()); // 1
+                frame_show(FRAME_BLUE, frame_step()); // 1
             }
             else {
-                frame_show(R, frame_step()); // 0
+                frame_show(FRAME_RED, frame_step()); // 0
             }
 
-            frame_show(G, frame_step());
+            frame_show(FRAME_GREEN, frame_step());
         }
     }
 
-    frame_show(G, SYNC_DURATION); // stop
+    frame_show(FRAME_GREEN, SYNC_DURATION); // stop
 
     endwin();
 

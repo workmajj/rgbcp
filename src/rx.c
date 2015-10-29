@@ -13,20 +13,12 @@ ffmpeg \
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "types.h"
+
 #define FRAME_W 320
 #define FRAME_H 240
 
 #define RGB_THRESH 64
-
-typedef unsigned long ulong;
-
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} FramePixel;
-
-typedef enum {X, R, G, B} FrameColor; // FIXME: shared
 
 FramePixel frame_get_avg(void)
 {
@@ -79,28 +71,28 @@ FrameColor frame_get_color(void)
     // printf("r: %d\tg: %d\tb: %d\t", avg.r, avg.g, avg.b);
 
     if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
-        return X;
+        return FRAME_NULL;
     }
 
     if (avg.r > avg.b && avg.r > avg.g) {
-        return R;
+        return FRAME_RED;
     }
     else if (avg.g > avg.r && avg.g > avg.b) {
-        return G;
+        return FRAME_GREEN;
     }
     else if (avg.b > avg.r && avg.b > avg.g) {
-        return B;
+        return FRAME_BLUE;
     }
 
-    return X;
+    return FRAME_NULL;
 }
 
 int main(void)
 {
     ulong frame = 0;
 
-    FrameColor curr = X;
-    FrameColor last = X;
+    FrameColor curr = FRAME_NULL;
+    FrameColor last = FRAME_NULL;
 
     setbuf(stdout, NULL);
 
@@ -109,10 +101,10 @@ int main(void)
 
         curr = frame_get_color();
 
-        if (curr != last && curr == R) {
+        if (curr != last && curr == FRAME_RED) {
             printf("0");
         }
-        else if (curr != last && curr == B) {
+        else if (curr != last && curr == FRAME_BLUE) {
             printf("1");
         }
 
