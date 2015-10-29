@@ -13,6 +13,6 @@ typedef struct {
 typedef enum {
     FRAME_NULL,
     FRAME_RED,
-    FRAME_BLUE,
-    FRAME_GREEN
+    FRAME_GREEN,
+    FRAME_BLUE
 } FrameColor;
