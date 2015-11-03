@@ -1,32 +1,48 @@
 <html>
-    <body style="background:rgb(0, 255, 0)">
+    <body style='background-color:rgb(0, 255, 0)'>
         <p>15 fps</p>
     </body>
     <script>
+        var body = document.getElementsByTagName('body')[0];
+
+        var change = function(rgb) {
+            body.style.backgroundColor = rgb;
+        };
+
         var ms_idx = 0;
-        var ms_step = [66, 66, 67]; // 15 fps (no rounding error)
+        var MS_STEP = [66, 66, 67]; // 15 fps (no rounding error)
 
         var delay = function() {
-            var tmp = ms_step[ms_idx];
-            ms_idx = (ms_idx === ms_step.length - 1) ? 0 : ms_idx + 1;
+            var tmp = MS_STEP[ms_idx];
+            ms_idx = (ms_idx === MS_STEP.length - 1) ? 0 : ms_idx + 1;
             return tmp;
         };
 
         var rgb_idx = 0;
-        var rgb_step = [
+        var RGB_STEP = [
             'rgb(255, 0, 0)',
             'rgb(0, 255, 0)',
             'rgb(0, 0, 255)',
             'rgb(0, 255, 0)'
         ];
 
+        var frame_count = 0;
+        var FRAME_MAX = 150;
+
         var cycle = function() {
-            document.getElementsByTagName('body')[0]
-                .style.backgroundColor = rgb_step[rgb_idx];
-            rgb_idx = (rgb_idx === rgb_step.length - 1) ? 0 : rgb_idx + 1;
-            setTimeout(cycle, delay());
+            change(RGB_STEP[rgb_idx]);
+            rgb_idx = (rgb_idx === RGB_STEP.length - 1) ? 0 : rgb_idx + 1;
+
+            frame_count++;
+
+            if (frame_count < FRAME_MAX) {
+                setTimeout(cycle, delay());
+            }
+            else {
+                change('rgb(0, 255, 0)');
+            }
         };
 
-        cycle();
+        setTimeout(cycle, 2000); // initial sync
     </script>
 </html>
