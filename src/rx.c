@@ -10,6 +10,7 @@ ffmpeg \
 */
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,6 +20,8 @@ ffmpeg \
 #define FRAME_H 240
 
 #define RGB_THRESH 64
+
+#define HIST_SIZE 4
 
 FramePixel frame_get_avg(void)
 {
@@ -68,8 +71,6 @@ FrameColor frame_get_color(void)
 {
     FramePixel avg = frame_get_avg();
 
-    // printf("r: %d\tg: %d\tb: %d\t", avg.r, avg.g, avg.b);
-
     if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
         return FRAME_NULL;
     }
@@ -87,61 +88,79 @@ FrameColor frame_get_color(void)
     return FRAME_NULL;
 }
 
+void hist_step(FrameColor hist[])
+{
+    for (uint i = HIST_SIZE - 1; i > 0; i--) {
+        hist[i] = hist[i - 1];
+    }
+}
+
+bool hist_is_green_except_curr(FrameColor hist[])
+{
+    for (uint i = 1; i < HIST_SIZE; i++) {
+        if (hist[i] != FRAME_GREEN) {
+            return false;
+        }
+    }
+
+    return (hist[0] != FRAME_GREEN);
+}
+
+bool hist_is_green(FrameColor hist[])
+{
+    for (uint i = 0; i < HIST_SIZE; i++) {
+        if (hist[i] != FRAME_GREEN) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 int main(void)
 {
-    ulong frame = 0;
+    assert(HIST_SIZE > 1);
 
-    FrameColor hist[4] = {FRAME_NULL};
+    FrameColor hist[HIST_SIZE] = {FRAME_NULL};
 
-    int f_started = 0;
+    bool streaming = false;
 
-    char c = 0;
+    char buf = 0;
     uint idx = 0;
 
     setbuf(stdout, NULL);
 
     while (1) {
-        // printf("frame: %lu\t", frame);
+        hist_step(hist);
 
-        hist[0] = hist[1];
-        hist[1] = hist[2];
-        hist[2] = hist[3];
-        hist[3] = frame_get_color();
+        hist[0] = frame_get_color();
 
-        if (!f_started &&
-            hist[0] == FRAME_GREEN &&
-            hist[1] == FRAME_GREEN &&
-            hist[2] == FRAME_GREEN &&
-            hist[3] != FRAME_GREEN) {
-                f_started = 1;
+        if (!streaming && hist_is_green_except_curr(hist)) {
+            streaming = true;
+        }
+        if (streaming && hist_is_green(hist)) {
+            break;
         }
 
-        if (f_started &&
-            hist[0] == FRAME_GREEN &&
-            hist[1] == FRAME_GREEN &&
-            hist[2] == FRAME_GREEN &&
-            hist[3] == FRAME_GREEN) {
-                break;
-        }
-
-        if (f_started && hist[3] != hist[2]) {
-            if (hist[3] == FRAME_RED) {
+        if (streaming && hist[0] != hist[1]) {
+            if (hist[0] == FRAME_RED) {
                 if (idx == 7) {
-                    printf("%c", c);
+                    printf("%c", buf);
 
-                    c = 0;
+                    buf = 0;
                     idx = 0;
                 }
                 else {
                     idx++;
                 }
             }
-            else if (hist[3] == FRAME_BLUE) {
-                c |= (0b10000000 >> idx);
-                if (idx == 7) {
-                    printf("%c", c);
+            else if (hist[0] == FRAME_BLUE) {
+                buf |= (0b10000000 >> idx);
 
-                    c = 0;
+                if (idx == 7) {
+                    printf("%c", buf);
+
+                    buf = 0;
                     idx = 0;
                 }
                 else {
@@ -149,9 +168,6 @@ int main(void)
                 }
             }
         }
-
-        // frame++;
-        // assert(frame > 0 && "overflow");
     }
 
     return 0;
