@@ -43,9 +43,10 @@
                 return;
             }
 
-            show(STEP_RGB[++idx_rgb]);
+            show(STEP_RGB[idx_rgb]);
             setTimeout(loop, STEP_MS[idx_ms]);
 
+            idx_rgb++;
             idx_ms = (idx_ms === STEP_MS.length - 1) ? 0 : idx_ms + 1;
         };
 
