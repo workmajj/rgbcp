@@ -77,10 +77,10 @@ FrameColor frame_get_color(void)
     if (avg.r > avg.b && avg.r > avg.g) {
         return FRAME_RED;
     }
-    else if (avg.g > avg.r && avg.g > avg.b) {
+    if (avg.g > avg.r && avg.g > avg.b) {
         return FRAME_GREEN;
     }
-    else if (avg.b > avg.r && avg.b > avg.g) {
+    if (avg.b > avg.r && avg.b > avg.g) {
         return FRAME_BLUE;
     }
 
@@ -91,29 +91,67 @@ int main(void)
 {
     ulong frame = 0;
 
-    FrameColor curr = FRAME_NULL;
-    FrameColor last = FRAME_NULL;
+    FrameColor hist[4] = {FRAME_NULL};
+
+    int f_started = 0;
+
+    char c = 0;
+    uint idx = 0;
 
     setbuf(stdout, NULL);
 
     while (1) {
         // printf("frame: %lu\t", frame);
 
-        curr = frame_get_color();
+        hist[0] = hist[1];
+        hist[1] = hist[2];
+        hist[2] = hist[3];
+        hist[3] = frame_get_color();
 
-        if (curr != last && curr == FRAME_RED) {
-            printf("0");
+        if (!f_started &&
+            hist[0] == FRAME_GREEN &&
+            hist[1] == FRAME_GREEN &&
+            hist[2] == FRAME_GREEN &&
+            hist[3] != FRAME_GREEN) {
+                f_started = 1;
         }
-        else if (curr != last && curr == FRAME_BLUE) {
-            printf("1");
+
+        if (f_started &&
+            hist[0] == FRAME_GREEN &&
+            hist[1] == FRAME_GREEN &&
+            hist[2] == FRAME_GREEN &&
+            hist[3] == FRAME_GREEN) {
+                break;
         }
 
-        // printf("\n");
+        if (f_started && hist[3] != hist[2]) {
+            if (hist[3] == FRAME_RED) {
+                if (idx == 7) {
+                    printf("%c", c);
 
-        last = curr;
+                    c = 0;
+                    idx = 0;
+                }
+                else {
+                    idx++;
+                }
+            }
+            else if (hist[3] == FRAME_BLUE) {
+                c |= (0b10000000 >> idx);
+                if (idx == 7) {
+                    printf("%c", c);
 
-        frame++;
-        assert(frame > 0 && "overflow");
+                    c = 0;
+                    idx = 0;
+                }
+                else {
+                    idx++;
+                }
+            }
+        }
+
+        // frame++;
+        // assert(frame > 0 && "overflow");
     }
 
     return 0;
