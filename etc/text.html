@@ -1,0 +1,54 @@
+<html>
+    <body style='background-color:rgb(0, 255, 0)'>
+        <p>text @ 15 fps</p>
+    </body>
+    <script>
+        var strToRgbArr = function(s) {
+            var a = [];
+
+            for (var i = 0, l = s.length; i < l; i++) {
+                var c = s.charCodeAt(i);
+
+                for (var j = 0; j < 8; j++) {
+                    if (c & (128 >> j)) {
+                        a.push('rgb(0, 0, 255)'); // 1
+                    }
+                    else {
+                        a.push('rgb(255, 0, 0)'); // 0
+                    }
+
+                    if (!(i === l - 1 && j === 7)) {
+                        a.push('rgb(0, 255, 0)');
+                    }
+                }
+            }
+
+            return a;
+        };
+
+        var body = document.getElementsByTagName('body')[0];
+        var show = function(rgb) {
+            body.style.backgroundColor = rgb;
+        };
+
+        var idx_rgb = 0;
+        var STEP_RGB = strToRgbArr('Pie for the dog, as well.');
+
+        var idx_ms = 0;
+        var STEP_MS = [66, 66, 67]; // 15 fps (no rounding)
+
+        var loop = function() {
+            if (idx_rgb >= STEP_RGB.length) {
+                show('rgb(0, 255, 0)'); // end
+                return;
+            }
+
+            show(STEP_RGB[++idx_rgb]);
+            setTimeout(loop, STEP_MS[idx_ms]);
+
+            idx_ms = (idx_ms === STEP_MS.length - 1) ? 0 : idx_ms + 1;
+        };
+
+        setTimeout(loop, 2000); // start
+    </script>
+</html>
