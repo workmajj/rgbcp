@@ -1,48 +1,40 @@
 <html>
     <body style='background-color:rgb(0, 255, 0)'>
-        <p>15 fps</p>
+        <p>loop @ 15 fps</p>
     </body>
     <script>
         var body = document.getElementsByTagName('body')[0];
-
-        var change = function(rgb) {
+        var show = function(rgb) {
             body.style.backgroundColor = rgb;
         };
 
-        var ms_idx = 0;
-        var MS_STEP = [66, 66, 67]; // 15 fps (no rounding error)
-
-        var delay = function() {
-            var tmp = MS_STEP[ms_idx];
-            ms_idx = (ms_idx === MS_STEP.length - 1) ? 0 : ms_idx + 1;
-            return tmp;
-        };
-
-        var rgb_idx = 0;
-        var RGB_STEP = [
+        var idx_rgb = 0;
+        var STEP_RGB = [
             'rgb(255, 0, 0)',
             'rgb(0, 255, 0)',
             'rgb(0, 0, 255)',
             'rgb(0, 255, 0)'
         ];
 
-        var frame_count = 0;
-        var FRAME_MAX = 150;
+        var idx_ms = 0;
+        var STEP_MS = [66, 66, 67]; // 15 fps (no rounding)
 
-        var cycle = function() {
-            change(RGB_STEP[rgb_idx]);
-            rgb_idx = (rgb_idx === RGB_STEP.length - 1) ? 0 : rgb_idx + 1;
-
-            frame_count++;
-
-            if (frame_count < FRAME_MAX) {
-                setTimeout(cycle, delay());
+        var count = 0;
+        var loop = function() {
+            if (count >= 120) {
+                show('rgb(0, 255, 0)'); // end
+                return;
             }
-            else {
-                change('rgb(0, 255, 0)');
-            }
+
+            show(STEP_RGB[idx_rgb]);
+            setTimeout(loop, STEP_MS[idx_ms]);
+
+            idx_rgb = (idx_rgb === STEP_RGB.length - 1) ? 0 : idx_rgb + 1;
+            idx_ms = (idx_ms === STEP_MS.length - 1) ? 0 : idx_ms + 1;
+
+            count++;
         };
 
-        setTimeout(cycle, 2000); // initial sync
+        setTimeout(loop, 2000); // start
     </script>
 </html>
