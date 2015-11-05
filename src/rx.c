@@ -21,7 +21,9 @@ ffmpeg \
 
 #define RGB_THRESH 64
 
-#define HIST_SIZE 4
+#define WAIT FRAME_GREEN
+#define ZERO FRAME_RED
+#define ONE FRAME_BLUE
 
 FramePixel frame_get_avg(void)
 {
@@ -67,7 +69,7 @@ FramePixel frame_get_avg(void)
     return avg;
 }
 
-FrameColor frame_get_color(void)
+FrameColor frame_get(void)
 {
     FramePixel avg = frame_get_avg();
 
@@ -88,84 +90,54 @@ FrameColor frame_get_color(void)
     return FRAME_NULL;
 }
 
-void hist_step(FrameColor hist[])
-{
-    for (uint i = HIST_SIZE - 1; i > 0; i--) {
-        hist[i] = hist[i - 1];
-    }
-}
-
-bool hist_is_green_except_curr(FrameColor hist[])
-{
-    for (uint i = 1; i < HIST_SIZE; i++) {
-        if (hist[i] != FRAME_GREEN) {
-            return false;
-        }
-    }
-
-    return (hist[0] != FRAME_GREEN);
-}
-
-bool hist_is_green(FrameColor hist[])
-{
-    for (uint i = 0; i < HIST_SIZE; i++) {
-        if (hist[i] != FRAME_GREEN) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 int main(void)
 {
-    assert(HIST_SIZE > 1);
+    FrameColor buf[4] = {FRAME_NULL}; // most recent first
 
-    FrameColor hist[HIST_SIZE] = {FRAME_NULL};
+    bool f_wait = true;
 
-    bool streaming = false;
-
-    char buf = 0;
+    char out = 0;
     uint idx = 0;
 
     setbuf(stdout, NULL);
 
-    while (1) {
-        hist_step(hist);
+    while (true) {
+        buf[3] = buf[2];
+        buf[2] = buf[1];
+        buf[1] = buf[0];
+        buf[0] = frame_get();
 
-        hist[0] = frame_get_color();
-
-        if (!streaming && hist_is_green_except_curr(hist)) {
-            streaming = true;
+        // start
+        if (f_wait &&
+            buf[3] == WAIT &&
+            buf[2] == WAIT &&
+            buf[1] == WAIT &&
+            buf[0] != WAIT) {
+                f_wait = false;
         }
-        if (streaming && hist_is_green(hist)) {
-            break;
+
+        // stop
+        if (!f_wait &&
+            buf[3] == WAIT &&
+            buf[2] == WAIT &&
+            buf[1] == WAIT &&
+            buf[0] == WAIT) {
+                break;
         }
 
-        if (streaming && hist[0] != hist[1]) {
-            if (hist[0] == FRAME_RED) {
-                if (idx == 7) {
-                    printf("%c", buf);
-
-                    buf = 0;
-                    idx = 0;
-                }
-                else {
-                    idx++;
-                }
+        if (!f_wait && buf[0] != buf[1] && (buf[0] == ZERO || buf[0] == ONE)) {
+            if (buf[0] == ONE) {
+                out |= (0b10000000 >> idx); // flip initial 0 to 1
             }
-            else if (hist[0] == FRAME_BLUE) {
-                buf |= (0b10000000 >> idx);
 
-                if (idx == 7) {
-                    printf("%c", buf);
+            if (idx == 7) {
+                putchar(out);
 
-                    buf = 0;
-                    idx = 0;
-                }
-                else {
-                    idx++;
-                }
+                out = 0;
+                idx = 0;
+            }
+            else {
+                idx++;
             }
         }
     }
