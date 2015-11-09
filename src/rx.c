@@ -125,6 +125,7 @@ int main(void)
                 break;
         }
 
+        // data
         if (!f_wait && buf[0] != buf[1] && (buf[0] == ZERO || buf[0] == ONE)) {
             if (buf[0] == ONE) {
                 out |= (0b10000000 >> idx); // flip initial 0 to 1
@@ -135,10 +136,11 @@ int main(void)
 
                 out = 0;
                 idx = 0;
+
+                continue;
             }
-            else {
-                idx++;
-            }
+
+            idx++;
         }
     }
 
