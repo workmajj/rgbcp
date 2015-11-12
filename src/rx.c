@@ -122,6 +122,7 @@ int main(void)
             buf[2] == WAIT &&
             buf[1] == WAIT &&
             buf[0] == WAIT) {
+                assert(out == 0 && idx == 0 && "last byte not flushed");
                 break;
         }
 
@@ -136,11 +137,10 @@ int main(void)
 
                 out = 0;
                 idx = 0;
-
-                continue;
             }
-
-            idx++;
+            else {
+                idx++;
+            }
         }
     }
 
