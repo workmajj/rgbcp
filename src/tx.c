@@ -16,11 +16,10 @@ uint frame_step(void)
     const uint DURATION_MS[] = {66, 66, 67}; // 15 fps
 
     static uint idx = 0;
-    uint i = idx;
-
+    uint ms = DURATION_MS[idx];
     idx = (idx == SIZE - 1) ? 0 : idx + 1;
 
-    return DURATION_MS[i];
+    return ms;
 }
 
 void frame_show(const FrameColor c, const uint duration_ms)
