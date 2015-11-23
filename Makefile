@@ -1,18 +1,16 @@
 CC = clang
-CFLAGS = -Wall -g
+CFLAGS = -MD -Wall -Werror -std=c99
 
-all: clean rgbcp
+.PHONY: all
+all: tx rx
 
-rgbcp: rx tx
+tx: src/tx.o src/types.h
+	$(CC) $(CFLAGS) src/tx.o -lncurses -o tx
 
-rx:
-	$(CC) -o rx src/rx.c
-tx:
-	$(CC) -o tx -lncurses src/tx.c
+rx: src/rx.o src/types.h
+	$(CC) $(CFLAGS) src/rx.o -o rx
 
 .PHONY: clean
 clean:
-	rm -f rx
-	rm -rf rx.dSYM
-	rm -f tx
-	rm -rf tx.dSYM
+	rm -f tx rx
+	rm -f ./*.o ./*.d
