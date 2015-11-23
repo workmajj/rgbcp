@@ -13,4 +13,4 @@ rx: src/rx.o src/types.h
 .PHONY: clean
 clean:
 	rm -f tx rx
-	rm -f ./*.o ./*.d
+	rm -f src/*.o src/*.d
