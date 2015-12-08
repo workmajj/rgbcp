@@ -14,3 +14,7 @@ typedef enum FrameColor {
     FRAME_GREEN,
     FRAME_BLUE
 } FrameColor;
+
+#define WAIT FRAME_GREEN
+#define ZERO FRAME_RED
+#define ONE FRAME_BLUE

@@ -10,10 +10,6 @@
 
 #define THRESH 64
 
-#define WAIT FRAME_GREEN
-#define ZERO FRAME_RED
-#define ONE FRAME_BLUE
-
 FramePixel frame_get_avg(void)
 {
     FramePixel avg;

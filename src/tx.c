@@ -8,10 +8,6 @@
 
 #define SYNC_MS 1000
 
-#define WAIT FRAME_GREEN
-#define ZERO FRAME_RED
-#define ONE FRAME_BLUE
-
 uint term_rows, term_cols;
 
 uint frame_step(void)
