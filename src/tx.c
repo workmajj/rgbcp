@@ -6,7 +6,11 @@
 
 #include "types.h"
 
-#define SYNC_DURATION 1000
+#define SYNC_MS 1000
+
+#define WAIT FRAME_GREEN
+#define ZERO FRAME_RED
+#define ONE FRAME_BLUE
 
 uint term_rows, term_cols;
 
@@ -54,7 +58,7 @@ int main(void)
 {
     initscr();
 
-    // FIXME: check has_colors()
+    // TODO: check has_colors()
 
     getmaxyx(stdscr, term_rows, term_cols);
 
@@ -63,24 +67,24 @@ int main(void)
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_BLUE, COLOR_BLUE);
 
-    frame_show(FRAME_GREEN, SYNC_DURATION); // start
-
     int c;
+
+    frame_show(WAIT, SYNC_MS); // start
 
     while ((c = getchar()) != EOF) {
         for (uint i = 0; i < 8; i++) {
             if (c & (0b10000000 >> i)) {
-                frame_show(FRAME_BLUE, frame_step()); // 1
+                frame_show(ONE, frame_step());
             }
             else {
-                frame_show(FRAME_RED, frame_step()); // 0
+                frame_show(ZERO, frame_step());
             }
 
-            frame_show(FRAME_GREEN, frame_step());
+            frame_show(WAIT, frame_step());
         }
     }
 
-    frame_show(FRAME_GREEN, SYNC_DURATION); // stop
+    frame_show(WAIT, SYNC_MS); // stop
 
     endwin();
 
