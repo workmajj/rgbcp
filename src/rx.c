@@ -1,14 +1,3 @@
-/*
-ffmpeg \
-    -loglevel panic \
-    -f avfoundation \
-    -pixel_format 0rgb \
-    -framerate 30 \
-    -video_size 320x240 \
-    -i "default:none" \
-    -f rawvideo - | ./rx
-*/
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -19,7 +8,7 @@ ffmpeg \
 #define FRAME_W 320
 #define FRAME_H 240
 
-#define RGB_THRESH 64
+#define THRESH 64
 
 #define WAIT FRAME_GREEN
 #define ZERO FRAME_RED
@@ -61,7 +50,7 @@ FramePixel frame_get_avg(void)
         assert(bytes > 0 && "overflow");
     }
 
-    // FIXME: round versus truncating
+    // TODO: round versus truncating
     avg.r = sum_r / (FRAME_W * FRAME_H);
     avg.g = sum_g / (FRAME_W * FRAME_H);
     avg.b = sum_b / (FRAME_W * FRAME_H);
@@ -73,7 +62,7 @@ FrameColor frame_get(void)
 {
     FramePixel avg = frame_get_avg();
 
-    if (avg.r < RGB_THRESH && avg.g < RGB_THRESH && avg.b < RGB_THRESH) {
+    if (avg.r < THRESH && avg.g < THRESH && avg.b < THRESH) {
         return FRAME_NULL;
     }
 
@@ -126,7 +115,6 @@ int main(void)
                 break;
         }
 
-        // data
         if (!f_wait && buf[0] != buf[1] && (buf[0] == ZERO || buf[0] == ONE)) {
             if (buf[0] == ONE) {
                 out |= (0b10000000 >> idx); // flip initial 0 to 1
