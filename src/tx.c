@@ -56,6 +56,8 @@ int main(void)
     initscr();
 
     if (!has_colors()) {
+        endwin();
+
         fprintf(stderr, "terminal doesn't support color\n");
         exit(1);
     }
