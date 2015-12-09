@@ -79,7 +79,7 @@ int main(void)
 {
     FrameColor buf[4] = {FRAME_NULL}; // most recent first
 
-    bool f_wait = true;
+    bool f_wait = true; // not yet receiving data
 
     char out = 0;
     uint idx = 0;
