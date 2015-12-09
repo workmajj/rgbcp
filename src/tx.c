@@ -16,6 +16,7 @@ uint frame_step(void)
     const uint DURATION_MS[] = {66, 66, 67}; // 15 fps
 
     static uint idx = 0;
+
     uint ms = DURATION_MS[idx];
     idx = (idx == SIZE - 1) ? 0 : idx + 1;
 
@@ -54,7 +55,10 @@ int main(void)
 {
     initscr();
 
-    // TODO: check has_colors()
+    if (!has_colors()) {
+        fprintf(stderr, "terminal doesn't support color\n");
+        exit(1);
+    }
 
     getmaxyx(stdscr, term_rows, term_cols);
 
