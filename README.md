@@ -35,7 +35,7 @@ To use `rgbcp` to copy data between two MacBooks:
 
 1. `rgbcp` depends on `ncurses` for sending and `ffmpeg` for receiving. Recent versions of OS X include `ncurses` by default, but you'll need to install `ffmpeg`. Using Homebrew:
 
-       $ brew install ffmpeg
+        $ brew install ffmpeg
 
 2. Next, clone the project from GitHub on both computers and build it from source:
 
